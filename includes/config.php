@@ -1,11 +1,11 @@
 <?php
 
-// Database configuration
+// Database configuration - Please ceate a new database first on your MySQL
 $servername = "localhost"; // or any other path to your MySQL server
 $username = "username"; // your MySQL username
 $password = "password"; //your  MySQL password
-$dbname = "yourdatabsename"; //create  a database on MySQL and put its name here
-$dir = "yourCSVfolder"; //modify it before
+$dbname = "yourdatabsename"; //new database name here
+$dir = "yourCSVfolder"; //your CSV files folder 
 
 // Create connection compatile with MySQL 5.X and 8.X
 $conn = new mysqli($servername, $username, $password, $dbname);

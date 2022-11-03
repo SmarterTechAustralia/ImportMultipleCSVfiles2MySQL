@@ -1,8 +1,10 @@
 <?php
+/* This script has been created by Kevin Jamali
+to import multible CSV files to MySQL
+Strongly recomanded to create a new Database for this script(see config)  */
 include('config.php');
 function csv2mysql($csvfile, $conn)
 {
-
     $tableCreated = 0;
     $whatIWant = substr($csvfile, strpos($csvfile, "/") + 1);
     $csvfileNameArray = explode(".", $whatIWant);
@@ -24,13 +26,12 @@ function csv2mysql($csvfile, $conn)
     for ($i = 0; $i < count($data); $i++) {
         $f = strtolower(trim($data[$i]));
         if ($f) {
-            // normalize the field name, strip to 20 chars if too long
+            // normalize the field name, strip to 1000 chars if too long
             $f = substr(preg_replace('/[^A-Za-z0-9]/', '', $f), 0, 1000);
             $field_count++;
             $fields[] = '`' . $f . '` LONGTEXT';
         }
     }
-    //print_r($fields);
 
     // remove if the table exist
     $sql = "DROP TABLE IF EXISTS $tableName";
@@ -39,10 +40,9 @@ function csv2mysql($csvfile, $conn)
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
+
     // create a new table
     $sql = "CREATE TABLE $tableName (" . implode(', ', $fields) . ') ENGINE=InnoDB';
-    //echo $sql;
-    // echo $sql . "<br /><br />";
     if ($conn->query($sql) === TRUE) {
         $tableCreated = 1;
     } else {
@@ -55,12 +55,9 @@ function csv2mysql($csvfile, $conn)
                 $fields[] = '\'' . addslashes($data[$i]) . '\'';
                 // trying to cleanup
                 $fields = preg_replace('/[\x00-\x1F\x7F]/u', '', $fields);
-                // $fields = mysqli_real_escape_string($conndsz, $fields);
-
             }
             $sql = "Insert into $tableName values(" . str_replace(",", "_", implode(', ', $fields)) . ')';
-            //$sql = "Insert into $tableName values(" . implode(', ', $fields) . ')';
-            //echo $sql;
+
             if ($conn->query($sql) === TRUE) {
                 //echo "New record created successfully";
             } else {
@@ -68,12 +65,12 @@ function csv2mysql($csvfile, $conn)
             }
         }
     }
-    //closing the file
+    //closing the CSV file
     fclose($handle);
     ini_set('auto_detect_line_endings', FALSE);
 
     if ($tableCreated == 1) {
-        //adding tempId for Index
+        //adding tempId for faster Index
         $sql3 = "ALTER TABLE $tableName ADD tempId INT PRIMARY KEY AUTO_INCREMENT";
         $result3 = $conn->query($sql3);
 
@@ -94,7 +91,6 @@ function csv2mysql($csvfile, $conn)
             mysqli_free_result($result3);
         }
     }
-
 
     $datareport = "<div class='alert alert-success'>CSV imported to<strong> $tableName </strong>table<strong>: $row </strong>records</div>";
     echo $datareport;

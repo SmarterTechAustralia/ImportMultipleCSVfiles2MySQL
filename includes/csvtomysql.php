@@ -1,7 +1,7 @@
 <?php
-/* This script has been created by Kevin Jamali
-to import multible CSV files to MySQL
-Strongly recomanded to create a new Database for this script(see config)  */
+/* Kevin Jamali has created this script
+to import multiple CSV files to MySQL
+Strongly recommended to create a new Database for this script(see config)  */
 include('config.php');
 function csv2mysql($csvfile, $conn)
 {
@@ -11,12 +11,12 @@ function csv2mysql($csvfile, $conn)
     $tableName = strtolower($csvfileNameArray[0]);
     $tableName = str_replace(" ", "", $tableName);
 
-    // get structure from csv and insert db
+    // Getting structure from CSV file and inserting in DB
     ini_set('auto_detect_line_endings', TRUE);
     $handle = fopen($csvfile, 'r');
     // first row, structure
     if (($data = fgetcsv($handle)) === FALSE) {
-        echo "Cannot read from csv $csvfile";
+        echo "Cannot read from CSV $csvfile";
         die();
     }
 
@@ -26,14 +26,14 @@ function csv2mysql($csvfile, $conn)
     for ($i = 0; $i < count($data); $i++) {
         $f = strtolower(trim($data[$i]));
         if ($f) {
-            // normalize the field name, strip to 1000 chars if too long
+            //Normalize the field name, strip to 1000 chars if too long
             $f = substr(preg_replace('/[^A-Za-z0-9]/', '', $f), 0, 1000);
             $field_count++;
             $fields[] = '`' . $f . '` LONGTEXT';
         }
     }
 
-    // remove if the table exist
+    // remove if the table exists
     $sql = "DROP TABLE IF EXISTS $tableName";
     if ($conn->query($sql) === TRUE) {
         //echo "Table Deleted If exist<br>";
@@ -41,7 +41,7 @@ function csv2mysql($csvfile, $conn)
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 
-    // create a new table
+    //Create a new table
     $sql = "CREATE TABLE $tableName (" . implode(', ', $fields) . ') ENGINE=InnoDB';
     if ($conn->query($sql) === TRUE) {
         $tableCreated = 1;
@@ -74,12 +74,12 @@ function csv2mysql($csvfile, $conn)
         $sql3 = "ALTER TABLE $tableName ADD tempId INT PRIMARY KEY AUTO_INCREMENT";
         $result3 = $conn->query($sql3);
 
-        // find number of rows 
+        //Find the number of rows 
         $sql3 = " SELECT count(*) FROM $tableName";
         $result3 = $conn->query($sql3);
         $row_cnt = $result3->num_rows;
         if ($result3) {
-            // it return number of rows in the table.
+            //It returns the number of rows in the table.
             $row = mysqli_num_rows($result3);
 
             if ($row) {
